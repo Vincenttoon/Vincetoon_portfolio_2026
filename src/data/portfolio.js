@@ -2,7 +2,7 @@ export const profile = {
   name: "Vincent Toon",
   title: "Director of Data & Technology",
   location: "Greater St. Louis",
-  profileImage: "/images/vincent-toon-profile.jpeg",
+  profileImage: `${import.meta.env.BASE_URL}images/vincent-toon-profile.jpeg`,
   summary:
     "Data infrastructure, cloud operations, internal platforms, compliance-focused automation, data analysis, and technical delivery for a large production environment is what I do every day.",
   valueStatement:
@@ -20,28 +20,24 @@ export const profile = {
     },
     {
       key: "profile",
-      value:
-        "male • blue eyes • midwest • relationship oriented • curious",
+      value: "male • blue eyes • midwest • relationship oriented • curious",
     },
   ],
   contextCards: [
     {
       key: "history",
       title: "How I got here",
-      body:
-        "Before technology, I spent years in restaurant management, craft beer sales, brewery operations, and just about every service-industry role in between. That background taught me how to lead people, stay calm when things break, communicate with anyone, and solve the problem directly in front of me. I eventually turned that same mindset toward data and technology.",
+      body: "Before technology, I spent years in restaurant management, craft beer sales, brewery operations, and just about every service-industry role in between. That background taught me how to lead people, stay calm when things break, communicate with anyone, and solve the problem directly in front of me. I eventually turned that same mindset toward data and technology.",
     },
     {
       key: "analysis",
       title: "How I use data",
-      body:
-        "Data analysis is a regular part of my work—not a side task. I validate external requests, analyze client and internal datasets, investigate anomalies, work with publicly available sources, and translate findings into decisions that technical and nontechnical teams can use. I also review and guide analytical work produced by my team.",
+      body: "Data analysis is a regular part of my work—not a side task. I validate external requests, analyze client and internal datasets, investigate anomalies, work with publicly available sources, and translate findings into decisions that technical and nontechnical teams can use. I also review and guide analytical work produced by my team.",
     },
     {
       key: "outside_work",
       title: "Outside the database",
-      body:
-        "I spend as much time as possible with family and friends, especially my niece and nephew, plus one dog and two cats. Music, video games, golf, bowling, volleyball, St. Louis sports, the Minnesota Vikings, breweries, concerts, wrestling, festivals, and farmers markets fill the rest of the calendar.",
+      body: "I spend as much time as possible with family and friends, especially my niece and nephew, plus one dog and two cats. Music, video games, golf, bowling, volleyball, St. Louis sports, the Minnesota Vikings, breweries, concerts, wrestling, festivals, and farmers markets fill the rest of the calendar.",
     },
   ],
   links: {
@@ -157,13 +153,7 @@ export const schemas = [
           "Cloud-based retention, archiving, backup, and recovery workflows for database and application systems.",
         details:
           "I support the lifecycle of cloud-hosted data by coordinating storage, archival movement, alternate infrastructure, and recovery procedures. Exact topology, retention rules, and operational runbooks are intentionally excluded. Inquire for more details.",
-        stack: [
-          "AWS EC2",
-          "Amazon S3",
-          "MySQL",
-          "Linux",
-          "Backup & Recovery",
-        ],
+        stack: ["AWS EC2", "Amazon S3", "MySQL", "Linux", "Backup & Recovery"],
         highlights: [
           "Supports production database and application infrastructure in AWS.",
           "Moves appropriate historical data into lower-cost archival storage.",
