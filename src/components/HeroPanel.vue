@@ -20,7 +20,7 @@ const imageFailed = ref(false)
   <section id="profile" class="hero-panel" aria-labelledby="hero-heading">
     <div class="hero-panel__grid">
       <div class="hero-copy__intro">
-        <p class="eyebrow">SELECT * FROM leadership_profile;</p>
+        <p class="eyebrow">SELECT * FROM portfolio;</p>
         <h1 id="hero-heading">
           {{ profile.name }}
           <span>{{ profile.title }}</span>
@@ -66,6 +66,14 @@ const imageFailed = ref(false)
             rel="noreferrer"
           >
             View GitHub
+          </a>
+          <a
+            class="button button--secondary"
+            :href="profile.links.resumePdf"
+            target="_blank"
+            rel="noreferrer"
+          >
+            View Résumé
           </a>
           <a
             class="button button--secondary"

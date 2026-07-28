@@ -24,7 +24,8 @@ The site includes:
 - Leadership, management, compliance, and audit experience
 - Previous employment and education
 - Personal interests, sports, music, games, media, family, pets, and craft beer
-- A contact section with email, Gmail, clipboard, LinkedIn, and GitHub options
+- A downloadable résumé in PDF and Word formats
+- A contact form that sends messages directly from the static site, plus email and LinkedIn fallbacks
 
 The lower half of the site behaves like a small database explorer. Visitors can switch between tables, search records, and open individual entries for more detail.
 
@@ -42,7 +43,7 @@ It also gave me a fun reason to build:
 - Nested record details
 - Responsive navigation
 - A mobile schema selector
-- A contact workflow that does not store visitor data
+- A contact workflow designed for a static GitHub Pages deployment
 
 ## Why Vue.js?
 
@@ -83,23 +84,28 @@ Some professional projects are intentionally generalized. They describe the purp
 
 For those projects: **inquire for more details**.
 
-The contact form is also intentionally backend-free. It can open a configured email application, open a prepared Gmail draft, or copy the complete message. The portfolio itself does not store the submitted information.
+The site is hosted on GitHub Pages, so the contact form uses FormSubmit as a lightweight external form endpoint. The form sends from the page without requiring the visitor to configure a local email application. Visitors are asked not to submit sensitive information through the form.
 
 ## Future Improvements
 
 A few things I may still add later:
 
-- A downloadable résumé
 - More screenshots or lightweight visual examples
 - Additional personal projects
-- A small backend contact option
 - More animation, as long as it does not get in the way
 - Whatever new responsibilities make this portfolio outdated next
 
 ## Questions?
 
-Questions, comments, opportunities, or anything else?
+Questions, comments, opportunities, or unusually interesting data problems?
 
 **vincenttoon22@gmail.com**
 
 
+## Résumé
+
+The current one-page résumé is included in both PDF and Word formats. It is linked from the main navigation, hero section, contact panel, mobile menu, and footer.
+
+## Contact Form Setup
+
+The contact form posts to FormSubmit from the Vue component. After the first deployment, submit one test message yourself and confirm the activation email sent to `vincenttoon22@gmail.com`. That one-time confirmation enables future portfolio submissions.

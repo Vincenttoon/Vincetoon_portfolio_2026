@@ -23,7 +23,10 @@ import { metrics, profile, schemas } from './data/portfolio'
         <strong>{{ profile.name }}</strong>
       </div>
       <p>Director of Data & Technology · Data · Infrastructure · Analysis · Leadership</p>
-      <a href="#contact">Initialize contact</a>
+      <div class="site-footer__links">
+        <a :href="profile.links.resumePdf" target="_blank" rel="noreferrer">View résumé</a>
+        <a href="#contact">Initialize contact</a>
+      </div>
     </footer>
   </div>
 </template>

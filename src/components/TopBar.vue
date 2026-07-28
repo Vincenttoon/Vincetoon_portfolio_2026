@@ -73,6 +73,7 @@ onBeforeUnmount(() => {
     <nav class="top-bar__nav" aria-label="Primary navigation">
       <a href="#profile">profile</a>
       <a href="#database">database</a>
+      <a :href="profile.links.resumePdf" target="_blank" rel="noreferrer">résumé</a>
       <a href="#contact">contact</a>
       <a :href="profile.links.github" target="_blank" rel="noreferrer">github</a>
       <a :href="profile.links.linkedin" target="_blank" rel="noreferrer">linkedin</a>
@@ -131,6 +132,14 @@ onBeforeUnmount(() => {
           </a>
 
           <div class="mobile-navigation__external">
+            <a
+              :href="profile.links.resumePdf"
+              target="_blank"
+              rel="noreferrer"
+              @click="closeMobileMenu"
+            >
+              Résumé ↗
+            </a>
             <a
               :href="profile.links.github"
               target="_blank"

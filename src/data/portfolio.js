@@ -44,6 +44,8 @@ export const profile = {
     github: "https://github.com/Vincenttoon",
     linkedin: "https://www.linkedin.com/in/vincent-toon-4954b6162/",
     email: "mailto:vincenttoon22@gmail.com",
+    resumePdf: `${import.meta.env.BASE_URL}resume/Vincent_Toon_Resume_2026.pdf`,
+    resumeDocx: `${import.meta.env.BASE_URL}resume/Vincent_Toon_Resume_2026.docx`,
   },
 };
 

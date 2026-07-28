@@ -8,122 +8,147 @@ const props = defineProps({
   },
 });
 
+const FORM_ENDPOINT = "https://formsubmit.co/ajax/vincenttoon22@gmail.com";
+
 const name = ref("");
 const email = ref("");
 const subject = ref("Opportunity inquiry");
 const message = ref("");
-const copiedEmail = ref(false);
-const copiedMessage = ref(false);
+const website = ref("");
+const submitState = ref("idle");
 const formMessage = ref("");
+const copiedEmail = ref(false);
 
 const emailAddress = computed(() =>
   props.profile.links.email.replace(/^mailto:/, ""),
 );
 
-const canSubmit = computed(
-  () =>
-    name.value.trim().length > 1 &&
-    email.value.trim().includes("@") &&
-    message.value.trim().length >= 10,
-);
+const isSending = computed(() => submitState.value === "sending");
 
-const composedBody = computed(() =>
-  [
-    `Name: ${name.value.trim()}`,
-    `Reply email: ${email.value.trim()}`,
-    "",
-    message.value.trim(),
-  ].join("\n"),
-);
+const directEmailBody = computed(() => {
+  const parts = [];
 
-const mailtoUrl = computed(() => {
-  if (!canSubmit.value) return props.profile.links.email;
+  if (name.value.trim()) {
+    parts.push(`Name: ${name.value.trim()}`);
+  }
 
-  return `${props.profile.links.email}?subject=${encodeURIComponent(
-    subject.value,
-  )}&body=${encodeURIComponent(composedBody.value)}`;
+  if (email.value.trim()) {
+    parts.push(`Reply email: ${email.value.trim()}`);
+  }
+
+  if (message.value.trim()) {
+    if (parts.length) parts.push("");
+    parts.push(message.value.trim());
+  }
+
+  return parts.join("\n");
 });
 
-const gmailUrl = computed(() => {
+const gmailComposeUrl = computed(() => {
   const params = new URLSearchParams({
     view: "cm",
     fs: "1",
     to: emailAddress.value,
-    su: subject.value,
-    body: composedBody.value,
+    su: subject.value || "Portfolio inquiry",
+    body: directEmailBody.value,
   });
 
   return `https://mail.google.com/mail/?${params.toString()}`;
 });
 
 function validateForm() {
-  if (canSubmit.value) {
-    formMessage.value = "";
-    return true;
+  if (name.value.trim().length < 2) {
+    formMessage.value = "Please enter your name.";
+    return false;
   }
 
-  formMessage.value =
-    "Please add your name, a valid reply email, and a message to grab my attention.";
-  return false;
-}
-
-function openDefaultEmail(event) {
-  if (!validateForm()) {
-    event.preventDefault();
-    return;
+  if (!/^\S+@\S+\.\S+$/.test(email.value.trim())) {
+    formMessage.value = "Please enter a valid reply email.";
+    return false;
   }
 
-  formMessage.value =
-    "Opening your configured email application. If nothing happens, use Gmail or copy the message instead.";
-}
-
-function openGmail(event) {
-  if (!validateForm()) {
-    event.preventDefault();
-    return;
+  if (message.value.trim().length < 10) {
+    formMessage.value = "Please add a little more detail to your message.";
+    return false;
   }
 
-  formMessage.value = "Opening a prepared Gmail message in a new tab…";
+  return true;
 }
 
-async function copyText(value, type) {
-  try {
-    await navigator.clipboard.writeText(value);
+async function sendMessage() {
+  submitState.value = "idle";
+  formMessage.value = "";
 
-    if (type === "email") {
-      copiedEmail.value = true;
-      window.setTimeout(() => {
-        copiedEmail.value = false;
-      }, 1800);
-    } else {
-      copiedMessage.value = true;
-      window.setTimeout(() => {
-        copiedMessage.value = false;
-      }, 1800);
-    }
-  } catch {
-    formMessage.value =
-      type === "email"
-        ? `Email: ${emailAddress.value}`
-        : "Your browser blocked clipboard access. Select and copy the form contents manually.";
-  }
-}
-
-function copyEmail() {
-  copyText(emailAddress.value, "email");
-}
-
-function copyPreparedMessage() {
   if (!validateForm()) return;
 
-  const prepared = [
-    `To: ${emailAddress.value}`,
-    `Subject: ${subject.value}`,
-    "",
-    composedBody.value,
-  ].join("\n");
+  // Honeypot: silently accept likely bot submissions.
+  if (website.value.trim()) {
+    submitState.value = "success";
+    formMessage.value = "Message sent. Thank you.";
+    return;
+  }
 
-  copyText(prepared, "message");
+  submitState.value = "sending";
+  formMessage.value = "Sending message…";
+
+  try {
+    const response = await fetch(FORM_ENDPOINT, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: name.value.trim(),
+        email: email.value.trim(),
+        subject: subject.value,
+        message: message.value.trim(),
+        _subject: `[Portfolio] ${subject.value}`,
+        _template: "table",
+        _captcha: "false",
+        _honey: website.value,
+        page: window.location.href,
+      }),
+    });
+
+    const result = await response.json().catch(() => ({}));
+
+    if (
+      !response.ok ||
+      result.success === false ||
+      result.success === "false"
+    ) {
+      throw new Error(
+        result.message || "The message service returned an error.",
+      );
+    }
+
+    submitState.value = "success";
+    formMessage.value =
+      "Message sent successfully. I will get back to you as soon as I can.";
+
+    name.value = "";
+    email.value = "";
+    subject.value = "Portfolio inquiry";
+    message.value = "";
+  } catch (error) {
+    console.error("Contact form submission failed:", error);
+    submitState.value = "error";
+    formMessage.value = `The form could not send right now. Please copy ${emailAddress.value} or open Gmail directly.`;
+  }
+}
+
+async function copyEmail() {
+  try {
+    await navigator.clipboard.writeText(emailAddress.value);
+    copiedEmail.value = true;
+
+    window.setTimeout(() => {
+      copiedEmail.value = false;
+    }, 1800);
+  } catch {
+    formMessage.value = `Email: ${emailAddress.value}`;
+  }
 }
 </script>
 
@@ -138,6 +163,7 @@ function copyPreparedMessage() {
         <p class="eyebrow">INSERT INTO new_conversation;</p>
         <h2 id="contact-heading">Start a conversation</h2>
       </div>
+
       <p>
         Opportunity, collaboration, technical leadership, data strategy,
         architecture, analysis, and all things fun are all good reasons to reach
@@ -163,17 +189,36 @@ function copyPreparedMessage() {
               <dt>location</dt>
               <dd>{{ profile.location }}</dd>
             </div>
+
             <div>
               <dt>email</dt>
               <dd>{{ emailAddress }}</dd>
             </div>
+
             <div>
-              <dt>response_mode</dt>
-              <dd>email or LinkedIn</dd>
+              <dt>résumé</dt>
+              <dd>PDF and Word formats available</dd>
             </div>
           </dl>
 
           <div class="contact-links">
+            <a
+              class="button button--primary"
+              :href="profile.links.resumePdf"
+              target="_blank"
+              rel="noreferrer"
+            >
+              View Résumé
+            </a>
+
+            <a
+              class="button button--secondary"
+              :href="profile.links.resumeDocx"
+              download
+            >
+              Download Word
+            </a>
+
             <button
               class="button button--secondary"
               type="button"
@@ -181,30 +226,28 @@ function copyPreparedMessage() {
             >
               {{ copiedEmail ? "Email copied" : "Copy email" }}
             </button>
+
             <a
               class="button button--ghost"
               :href="profile.links.linkedin"
               target="_blank"
               rel="noreferrer"
             >
-              Open LinkedIn
-            </a>
-            <a
-              class="button button--ghost"
-              :href="profile.links.github"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Open GitHub
+              LinkedIn
             </a>
           </div>
         </div>
       </article>
 
-      <form class="contact-form" @submit.prevent>
+      <form
+        class="contact-form"
+        :action="`https://formsubmit.co/${emailAddress}`"
+        method="POST"
+        @submit.prevent="sendMessage"
+      >
         <div class="window-chrome">
-          <span class="window-chrome__title">compose_message.sql</span>
-          <span class="window-chrome__meta">NO_DATA_STORED</span>
+          <span class="window-chrome__title">send_message.sql</span>
+          <span class="window-chrome__meta">DIRECT_SEND</span>
         </div>
 
         <div class="contact-form__body">
@@ -216,6 +259,7 @@ function copyPreparedMessage() {
                 name="name"
                 autocomplete="name"
                 placeholder="Your name"
+                required
               />
             </label>
 
@@ -227,6 +271,7 @@ function copyPreparedMessage() {
                 type="email"
                 autocomplete="email"
                 placeholder="you@example.com"
+                required
               />
             </label>
           </div>
@@ -248,48 +293,56 @@ function copyPreparedMessage() {
               v-model="message"
               name="message"
               rows="7"
-              placeholder="'What's on your mind?' - Facebook, 2009-Present …"
+              placeholder="'What's on your mind?' - Facebook (2009-Present) …"
+              required
             ></textarea>
           </label>
 
-          <div class="contact-form__actions contact-form__actions--stacked">
-            <a
-              class="button button--primary"
-              :href="mailtoUrl"
-              @click="openDefaultEmail"
-            >
-              Open email application
-            </a>
+          <label class="contact-form__honeypot" aria-hidden="true">
+            Website
+            <input
+              v-model="website"
+              name="_honey"
+              tabindex="-1"
+              autocomplete="off"
+            />
+          </label>
 
-            <a
-              class="button button--secondary"
-              :href="gmailUrl"
-              target="_blank"
-              rel="noreferrer"
-              @click="openGmail"
-            >
-              Compose in Gmail
-            </a>
+          <input type="hidden" name="_template" value="table" />
+          <input type="hidden" name="_captcha" value="false" />
 
+          <div class="contact-form__actions">
             <button
-              class="button button--ghost"
-              type="button"
-              @click="copyPreparedMessage"
+              class="button button--primary"
+              type="submit"
+              :disabled="isSending"
             >
-              {{ copiedMessage ? "Message copied" : "Copy prepared message" }}
+              {{ isSending ? "Sending…" : "Send message" }}
             </button>
+
+            <a
+              class="button button--ghost"
+              :href="gmailComposeUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Email with Gmail
+            </a>
           </div>
 
           <small class="contact-form__privacy">
-            The portfolio does not send or store this form. “Open email
-            application” depends on your browser or operating system having a
-            mail handler configured. Gmail opens through the web and works
-            during local development or after deployment.
+            This static site uses FormSubmit to deliver messages. The Gmail
+            option opens a prepared message in a new browser tab. Please do not
+            include passwords, private records, or other sensitive information.
           </small>
 
           <p
             v-if="formMessage"
             class="contact-form__message"
+            :class="{
+              'contact-form__message--success': submitState === 'success',
+              'contact-form__message--error': submitState === 'error',
+            }"
             aria-live="polite"
           >
             {{ formMessage }}
